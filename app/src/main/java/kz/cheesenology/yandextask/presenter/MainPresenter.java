@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
+import com.arellomobile.mvp.presenter.InjectPresenter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,11 +18,11 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 @InjectViewState
-public class ImagePresenter extends MvpPresenter<MainView> {
+public class MainPresenter extends MvpPresenter<MainView> {
 
     NetworkService service;
 
-    public ImagePresenter() {
+    public MainPresenter() {
         if (this.service == null) {
             this.service = new NetworkService();
         }
@@ -35,6 +36,8 @@ public class ImagePresenter extends MvpPresenter<MainView> {
     }
 
     public void getImagesFromNetwork() {
+        getViewState().toggleProgressBar(true);
+
         service.getAPI().getImages()
                 .enqueue(new Callback<ResponseModel>() {
                     @Override
@@ -45,10 +48,13 @@ public class ImagePresenter extends MvpPresenter<MainView> {
                         if (response.body() != null) {
                             List<ResponseModel.Hit> hits = response.body().getHits();
                             for (int i = 0; i < hits.size(); i++) {
-                                list.add(new AdapterModel(hits.get(i).getLargeImageURL()));
+                                list.add(new AdapterModel(
+                                        hits.get(i).getLargeImageURL(),
+                                        hits.get(i).getPreviewURL()));
                             }
                         }
                         getViewState().showImages(list);
+                        getViewState().toggleProgressBar(false);
                     }
 
                     @Override

@@ -2,8 +2,11 @@ package kz.cheesenology.yandextask.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
+import android.widget.ProgressBar;
 
 import com.arellomobile.mvp.MvpAppCompatActivity;
 import com.arellomobile.mvp.presenter.InjectPresenter;
@@ -14,15 +17,18 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import kz.cheesenology.yandextask.R;
 import kz.cheesenology.yandextask.model.AdapterModel;
-import kz.cheesenology.yandextask.presenter.ImagePresenter;
+import kz.cheesenology.yandextask.presenter.MainPresenter;
 
 public class MainActivity extends MvpAppCompatActivity implements MainView {
 
     @InjectPresenter
-    ImagePresenter presenter;
+    MainPresenter presenter;
 
     @BindView(R.id.rv_main)
     RecyclerView recyclerView;
+
+    @BindView(R.id.pb_main)
+    ProgressBar progressBar;
 
     ImagesAdapter adapter;
 
@@ -30,6 +36,8 @@ public class MainActivity extends MvpAppCompatActivity implements MainView {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.hide();
 
         ButterKnife.bind(this);
 
@@ -41,7 +49,7 @@ public class MainActivity extends MvpAppCompatActivity implements MainView {
 
             adapter.setCallback(model -> {
                 Intent intent = new Intent(getApplicationContext(), ImageActivity.class);
-                intent.putExtra("image_url", model.getImgURL());
+                intent.putExtra("image_url", model.getURL());
                 startActivity(intent);
             });
 
@@ -58,5 +66,11 @@ public class MainActivity extends MvpAppCompatActivity implements MainView {
     @Override
     public void showImages(List<AdapterModel> list) {
         adapter.setData(list);
+    }
+
+    @Override
+    public void toggleProgressBar(boolean isLoading) {
+        progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
+        recyclerView.setVisibility(isLoading ? View.GONE : View.VISIBLE);
     }
 }

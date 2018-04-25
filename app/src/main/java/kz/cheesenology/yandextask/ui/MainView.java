@@ -9,4 +9,6 @@ import kz.cheesenology.yandextask.model.AdapterModel;
 public interface MainView extends MvpView {
 
     void showImages(List<AdapterModel> list);
+
+    void toggleProgressBar(boolean isLoading);
 }
